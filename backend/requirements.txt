@@ -1,0 +1,9 @@
+# 简历解析后端依赖
+PyMuPDF>=1.23.0
+docx2txt>=0.8
+requests>=2.31.0
+
+# FastAPI 服务（可选）
+fastapi>=0.104.0
+uvicorn>=0.24.0
+python-multipart>=0.0.6
