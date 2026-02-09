@@ -135,14 +135,14 @@ cvfiller/
 
 ```python
 AI_API_KEY = "your-api-key"
-AI_API_URL = "https://tcamp.qq.com/openai/chat/completions"
+AI_API_URL = "your-api-url"
 ```
 
 或使用环境变量：
 
 ```bash
 export AI_API_KEY="your-api-key"
-export AI_API_URL="https://tcamp.qq.com/openai/chat/completions"
+export AI_API_URL="your-api-url"
 ```
 
 ---
