@@ -3,7 +3,11 @@ PyMuPDF>=1.23.0
 docx2txt>=0.8
 requests>=2.31.0
 
-# FastAPI 服务（可选）
+# FastAPI 服务
 fastapi>=0.104.0
 uvicorn>=0.24.0
 python-multipart>=0.0.6
+
+# 数据库和认证
+PyJWT>=2.8.0
+pydantic[email]>=2.5.0
