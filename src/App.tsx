@@ -262,6 +262,13 @@ function App() {
     }
 
     // 保存文件到 state（在清空 input 之前）
+    // 检查是否登录
+    if (!token) {
+      showNotification('提示', '请先登录后再上传简历', 'warning');
+      setShowLoginDialog(true);
+      return;
+    }
+
     setUploadedFile(file);
 
     setIsUploading(true);
@@ -273,6 +280,9 @@ function App() {
 
       const response = await fetch(`${API_BASE_URL}/api/parse-resume`, {
         method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
         body: formData,
       });
 
@@ -379,6 +389,13 @@ function App() {
       return;
     }
 
+    // 检查是否登录
+    if (!token) {
+      showNotification('提示', '请先登录后再获取简历建议', 'warning');
+      setShowLoginDialog(true);
+      return;
+    }
+
     // 检查是否有上传的文件
     if (!uploadedFile) {
       showNotification('提示', '请先上传简历文件', 'warning');
@@ -394,6 +411,9 @@ function App() {
 
       const response = await fetch(`${API_BASE_URL}/api/resume-advice`, {
         method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
         body: formData,
       });
 
@@ -964,6 +984,125 @@ function App() {
           </div>
         </Footer>
       </Layout>
+
+      {/* 登录弹窗 */}
+      <Dialog
+        header="用户登录"
+        visible={showLoginDialog}
+        onClose={() => setShowLoginDialog(false)}
+        footer={
+          <div className="flex justify-end space-x-3">
+            <Button theme="default" onClick={() => setShowLoginDialog(false)}>取消</Button>
+            <Button theme="primary" loading={isLoggingIn} onClick={handleLogin}>登录</Button>
+          </div>
+        }
+      >
+        <div className="space-y-4 py-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">邮箱</label>
+            <Input
+              type="text"
+              placeholder="请输入邮箱"
+              value={loginForm.email}
+              onChange={(val) => setLoginForm({ ...loginForm, email: val as string })}
+              prefixIcon={<UserIcon />}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">密码</label>
+            <Input
+              type="password"
+              placeholder="请输入密码"
+              value={loginForm.password}
+              onChange={(val) => setLoginForm({ ...loginForm, password: val as string })}
+              prefixIcon={<LockOnIcon />}
+            />
+          </div>
+          <div className="text-center text-sm text-gray-500">
+            还没有账号？
+            <Button
+              theme="primary"
+              variant="text"
+              size="small"
+              onClick={() => {
+                setShowLoginDialog(false);
+                setShowRegisterDialog(true);
+              }}
+            >
+              立即注册
+            </Button>
+          </div>
+        </div>
+      </Dialog>
+
+      {/* 注册弹窗 */}
+      <Dialog
+        header="注册账号"
+        visible={showRegisterDialog}
+        onClose={() => setShowRegisterDialog(false)}
+        footer={
+          <div className="flex justify-end space-x-3">
+            <Button theme="default" onClick={() => setShowRegisterDialog(false)}>取消</Button>
+            <Button theme="primary" loading={isRegistering} onClick={handleRegister}>注册</Button>
+          </div>
+        }
+      >
+        <div className="space-y-4 py-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">用户名</label>
+            <Input
+              placeholder="请输入用户名"
+              value={registerForm.username}
+              onChange={(val) => setRegisterForm({ ...registerForm, username: val as string })}
+              prefixIcon={<UserIcon />}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">邮箱</label>
+            <Input
+              type="text"
+              placeholder="请输入邮箱"
+              value={registerForm.email}
+              onChange={(val) => setRegisterForm({ ...registerForm, email: val as string })}
+              prefixIcon={<UserIcon />}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">密码</label>
+            <Input
+              type="password"
+              placeholder="请输入密码"
+              value={registerForm.password}
+              onChange={(val) => setRegisterForm({ ...registerForm, password: val as string })}
+              prefixIcon={<LockOnIcon />}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">确认密码</label>
+            <Input
+              type="password"
+              placeholder="请再次输入密码"
+              value={registerForm.confirmPassword}
+              onChange={(val) => setRegisterForm({ ...registerForm, confirmPassword: val as string })}
+              prefixIcon={<LockOnIcon />}
+            />
+          </div>
+          <div className="text-center text-sm text-gray-500">
+            已有账号？
+            <Button
+              theme="primary"
+              variant="text"
+              size="small"
+              onClick={() => {
+                setShowRegisterDialog(false);
+                setShowLoginDialog(true);
+              }}
+            >
+              立即登录
+            </Button>
+          </div>
+        </div>
+      </Dialog>
     </div>
   );
 }

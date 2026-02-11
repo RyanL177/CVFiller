@@ -505,9 +505,12 @@ async def delete_resume_api(
     return {"status": "success", "message": "简历删除成功"}
 
 @app.post("/api/parse-resume")
-async def api_parse_resume(file: UploadFile = File(...)):
+async def api_parse_resume(
+    file: UploadFile = File(...),
+    current_user: dict = Depends(get_current_user)
+):
     """
-    简历解析 API 端点
+    简历解析 API 端点（需要登录）
     """
     # 检查文件类型
     allowed_extensions = {'.pdf', '.docx', '.doc'}
@@ -535,9 +538,12 @@ async def api_parse_resume(file: UploadFile = File(...)):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/resume-advice")
-async def api_resume_advice(file: UploadFile = File(...)):
+async def api_resume_advice(
+    file: UploadFile = File(...),
+    current_user: dict = Depends(get_current_user)
+):
     """
-    简历修改建议 API 端点
+    简历修改建议 API 端点（需要登录）
     """
     import traceback
     
@@ -551,7 +557,7 @@ async def api_resume_advice(file: UploadFile = File(...)):
         )
     
     try:
-        print(f"[DEBUG] 收到简历建议请求: {file.filename}")
+        print(f"[DEBUG] 收到简历建议请求: {file.filename}, 用户: {current_user['username']}")
         
         # 读取文件内容
         contents = await file.read()
