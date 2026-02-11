@@ -308,10 +308,13 @@ def parse_resume_from_bytes(file_bytes: bytes, filename: str) -> Dict[str, Any]:
 
 from fastapi import FastAPI, UploadFile, File, HTTPException, Depends, Header
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, EmailStr
 from typing import List
 import jwt
 from datetime import datetime, timedelta
+import os
 
 # 导入数据库模块
 from database import (
@@ -593,6 +596,36 @@ async def api_resume_advice(file: UploadFile = File(...)):
 @app.get("/api/health")
 async def health_check():
     return {"status": "healthy", "service": "CVFiller Resume Parser"}
+
+
+# ========== 静态文件服务（前端） ==========
+
+# 获取静态文件目录路径
+STATIC_DIR = os.path.join(os.path.dirname(__file__), "..", "dist")
+if not os.path.exists(STATIC_DIR):
+    # Docker 环境中的路径
+    STATIC_DIR = "/app/dist"
+
+# 挂载静态文件目录
+if os.path.exists(STATIC_DIR):
+    app.mount("/assets", StaticFiles(directory=os.path.join(STATIC_DIR, "assets")), name="assets")
+    
+    @app.get("/", response_class=FileResponse)
+    async def serve_index():
+        """提供首页"""
+        return FileResponse(os.path.join(STATIC_DIR, "index.html"))
+    
+    @app.get("/{path:path}")
+    async def serve_spa(path: str):
+        """SPA 路由处理"""
+        # API 路由不走这里
+        if path.startswith("api/"):
+            raise HTTPException(status_code=404, detail="Not Found")
+        # 其他路由返回 index.html 支持前端路由
+        index_file = os.path.join(STATIC_DIR, "index.html")
+        if os.path.exists(index_file):
+            return FileResponse(index_file)
+        raise HTTPException(status_code=404, detail="Not Found")
 
 
 def preprocess_text(text: str) -> str:
